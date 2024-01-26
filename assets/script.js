@@ -51,3 +51,14 @@ function hideCategoryField() {
   categoryMinusButton.style.display = "none";
   categoryInputField.style.display = "none";
 }
+
+//Modals dissapear
+// const successModals = document.getElementsByClassName("success");
+// const failureModals = document.querySelectorAll(".failure");
+
+// if ((successModals.style.display = "block")) {
+//   //setTimeout((successModals.style.display = "none"), 3000);
+//   setTimeout(console.log("gone"), 3000);
+// }
+
+//setTimeout(document.getElementById('thanks1').style.display = "none", 3000)

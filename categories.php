@@ -1,15 +1,27 @@
 <?php
 
+session_start(); 
+
 include('server/connection.php');
+
+//Block if not logged_in
+if(!isset($_SESSION['logged_in'])){
+    header('location: login.php');
+}
+
+//USER_ID for queries => added in v3
+if(isset($_SESSION['logged_in'])){
+    $userId = $_SESSION['user_id'];
+}
 
 //ADD NEW CATEGORY
 if(isset($_POST['new-category-btn'])){
     $newCategoryName = $_POST['input-category'];
     $newCategoryInputBool = $_POST['income-bool'];
 
-    $stmt22 = $conn_db->prepare("INSERT INTO categories (category_name, category_income)
-                                 VALUES (?,?)");
-    $stmt22->bind_param('si', $newCategoryName, $newCategoryInputBool);
+    $stmt22 = $conn_db->prepare("INSERT INTO categories (category_name, category_income, user_id)
+                                 VALUES (?,?,?)");
+    $stmt22->bind_param('sii', $newCategoryName, $newCategoryInputBool, $userId);
     if($stmt22->execute()){
         header('location: categories.php?new_category_success=Du hast eine neue Kategorie erstellt!');
     } else {
@@ -18,7 +30,8 @@ if(isset($_POST['new-category-btn'])){
 }
 
 //GET ALL CATEGORIES
-$stmt16 = $conn_db->prepare("SELECT * FROM categories");
+$stmt16 = $conn_db->prepare("SELECT * FROM categories WHERE user_id = ?");
+$stmt16->bind_param('i', $userId);
 $stmt16->execute();
 $categories = $stmt16->get_result();
 
@@ -30,7 +43,7 @@ if(isset($_POST['edit-btn'])){
     $categoryIncome = $_POST['category-income'];
 
     $stmt17 = $conn_db->prepare("UPDATE categories SET category_name = ?, category_income = ?
-                                WHERE category_id = ?");
+                                WHERE category_id = ?"); // I think there is no need for user_id here, the dataset is accessed thru category_id
     $stmt17->bind_param('sii', $categoryName, $categoryIncome, $categoryID);
     if($stmt17->execute()){
         header('location: categories.php?edit_success_message=Ihre Kategorie wurde geändert!');

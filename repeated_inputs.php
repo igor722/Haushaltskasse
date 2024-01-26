@@ -1,16 +1,31 @@
 <?php
 
+session_start();
+
 include('server/connection.php');
+
+//Block if not logged_in
+if(!isset($_SESSION['logged_in'])){
+    header('location: login.php');
+}
+
+//USER_ID for queries => added in v3
+if(isset($_SESSION['logged_in'])){
+    $userId = $_SESSION['user_id'];
+}
 
 $stmt11 = $conn_db->prepare("SELECT repeated_input_id, repeated_input_name, repeated_input_amount, categories.category_id, categories.category_name 
                             FROM repeated_inputs
                             LEFT JOIN categories ON categories.category_id = repeated_inputs.category_id
+                            WHERE repeated_inputs.user_id = ?
                             ORDER BY repeated_input_id DESC");
+$stmt11->bind_param('i', $userId);
 $stmt11->execute();
 $getAllRepeatedInputs = $stmt11->get_result();
 
 //all categories for edit form
-$stmt12 = $conn_db->prepare("SELECT category_id, category_name FROM categories");
+$stmt12 = $conn_db->prepare("SELECT category_id, category_name FROM categories WHERE user_id = ?");
+$stmt12->bind_param('i', $userId);
 $stmt12->execute();
 $getAllCategories = $stmt12->get_result();
 
@@ -66,9 +81,9 @@ if(isset($_POST['insert-btn'])){
     $repeatedInputCategory = $_POST['input-category'];
     $todayDate             = date("Y-m-d");
 
-    $stmt15 = $conn_db->prepare("INSERT INTO inputs (input_name, category_id, input_amount, input_datum)
-                                 VALUES (?, ?, ?, ?)");
-    $stmt15->bind_param('siis', $repeatedInputName, $repeatedInputCategory, $repeatedInputAmount, $todayDate);
+    $stmt15 = $conn_db->prepare("INSERT INTO inputs (input_name, category_id, input_amount, input_datum, user_id)
+                                 VALUES (?, ?, ?, ?, ?)");
+    $stmt15->bind_param('siisi', $repeatedInputName, $repeatedInputCategory, $repeatedInputAmount, $todayDate, $userId);
     if($stmt15->execute()){
         header('location: all_inputs.php?add_success_message=Ihr Eintrag wurde zugefügt!');
     } else {

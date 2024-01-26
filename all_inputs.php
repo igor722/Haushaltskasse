@@ -1,17 +1,32 @@
 <?php
 
+session_start();
+
+//Block if not logged_in
+if(!isset($_SESSION['logged_in'])){
+    header('location: login.php');
+}
+
 include('server/connection.php');
 
+//USER_ID for queries => added in v3
+if(isset($_SESSION['logged_in'])){
+    $userId = $_SESSION['user_id'];
+}
+
 //all inputs
-$stmt6 = $conn_db->prepare("SELECT input_id, input_name, input_amount, input_datum, categories.category_id, categories.category_name 
+$stmt6 = $conn_db->prepare("SELECT input_id, input_name, input_amount, input_datum, inputs.user_id, categories.category_id, categories.category_name 
                             FROM inputs
                             LEFT JOIN categories ON categories.category_id = inputs.category_id
+                            WHERE inputs.user_id = ?
                             ORDER BY input_datum DESC");
+$stmt6->bind_param('i', $userId);
 $stmt6->execute();
 $getAllInputs = $stmt6->get_result();
 
 //all categories for edit form
-$stmt7 = $conn_db->prepare("SELECT category_id, category_name FROM categories");
+$stmt7 = $conn_db->prepare("SELECT category_id, category_name FROM categories WHERE user_id = ?");
+$stmt7->bind_param('i', $userId);
 $stmt7->execute();
 $getAllCategories = $stmt7->get_result();
 

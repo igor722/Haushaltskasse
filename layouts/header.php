@@ -1,4 +1,17 @@
-<?php //session_start(); ?>
+<?php
+
+
+
+if(isset($_GET['logout'])){
+    if(isset($_SESSION['logged_in'])){
+        unset($_SESSION['logged_in']);
+        unset($_SESSION['user_email']);
+        unset($_SESSION['user_name']);
+        header('location: login.php');
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,5 +27,6 @@
         <a href="all_inputs.php"><button>Eintraege</button></a>
         <a href="repeated_inputs.php"><button>Gespeicherte Einträge</button></a>
         <a href="categories.php"><button>Kategorien</button></a>
+        <a href="index.php?logout=1"><button>Logout</button></a>
     </div>
 

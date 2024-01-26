@@ -59,6 +59,7 @@ if(isset($_POST['register-btn'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/style.css">
     <title>Budget-Tracker</title>
 </head>
 <body>
@@ -67,30 +68,32 @@ if(isset($_POST['register-btn'])){
     <?php if(isset($_GET['error'])) { ?>
         <p style="color: red;"><?php echo $_GET['error']; ?></p>
     <?php } ?>
+    <main>
+        <form class="login-register" action="register.php" method="POST">
+            <div class="form-row">
+                <div class="form-unit">
+                    <label>Nutzername:</label>
+                    <input type="text" name="user-name" id="" required>
+                </div>
+                <div class="form-row">
+                    <label>E-Mail:</label>
+                    <input type="email" name="user-email" id="" required>
+                </div>
+                <div class="form-row">
+                    <label>Kennwort:</label>
+                    <input type="password" name="user-password" required>
+                </div>
+                <div class="form-row">
+                    <label>Kennwort wiederholen:</label>
+                    <input type="password" name="user-password-repeat" required>
+                </div>
+                <div class="form-row">
+                    <input class="register-login-btn" type="submit" name="register-btn" value="Registrieren">
+                </div>
+            </div>
 
-    <form action="index.php" method="POST">
-        <div class="form-row">
-            <div class="form-unit">
-                <label>Nutzername:</label>
-                <input type="text" name="user-name" id="" required>
-            </div>
-            <div class="form-row">
-                <label>E-Mail:</label>
-                <input type="email" name="user-email" id="" required>
-            </div>
-            <div class="form-row">
-                <label>Kennwort:</label>
-                <input type="password" name="user-password" required>
-            </div>
-            <div class="form-row">
-                <label>Kennwort wiederholen:</label>
-                <input type="password" name="user-password-repeat" required>
-            </div>
-            <div class="form-row">
-                <input type="submit" name="register-btn" value="Registrieren">
-            </div>
-        </div>
-
-    </form>
+        </form>
+        <p class="link">Hast bereits ein Konto erstellt?<a href="login.php">Hier Anmelden</a></p>
+    </main>
 </body>
 </html>

@@ -390,7 +390,7 @@ button:focus {
     max-width: 100px;
 }
 
-.edit-repeated-btn{
+.edit-repeated-btn, .register-login-btn{
     background-color: #48D390;
 }
 
@@ -409,3 +409,19 @@ button:focus {
 #category-input, #new-category-minus {
     display: none;
 }
+
+/* ==============================LOGIN/REGISTER============================== */
+.login-register{
+    width:60%;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.link {
+    text-align: center;
+}
+
+.link>a{
+ color: #DFDEDF;
+}
+

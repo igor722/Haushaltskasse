@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 include('server/connection.php');
 
@@ -22,9 +23,9 @@ if(isset($_POST['login-btn'])){
         if($stmt21->num_rows() == 1){
             $stmt21->fetch();
 
-            $_SESSION['user_id'] = $user_id;
-            $_SESSION['user_email'] = $user_email;
-            $_SESSION['user_name'] = $user_name;
+            $_SESSION['user_id'] = $userId;
+            $_SESSION['user_email'] = $userEmail;
+            $_SESSION['user_name'] = $userName;
             $_SESSION['logged_in'] = true;
 
             header('location: index.php?login_success=Du bist eingeloggt!');
@@ -34,6 +35,8 @@ if(isset($_POST['login-btn'])){
     }
 }
 
+
+
 ?>
 
 <!DOCTYPE html>
@@ -41,25 +44,30 @@ if(isset($_POST['login-btn'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/style.css">
     <title>Budget-Tracker</title>
 </head>
 <body>
-    <?php if(isset($_GET['error'])) { ?>
-        <p style="color: red;"><?php echo $_GET['error']; ?></p>
-    <?php } ?>
+    <main>
+        <?php if(isset($_GET['error'])) { ?>
+            <p style="color: red;"><?php echo $_GET['error']; ?></p>
+        <?php } ?>
 
-    <form action="login.php" method="POST">
-        <div class="form-row">
-            <label>E-Mail:</label>
-            <input type="email" name="user-email" id="">
-        </div>
-        <div class="form-row">
-            <label>Kennwort:</label>
-            <input type="password" name="user-password">
-        </div>
-        <div class="form-row">
-            <input type="submit" name="login-btn" value="Anmelden">
-        </div>
-    </form>
+        <form class="login-register" action="login.php" method="POST">
+            <div class="form-row">
+                <label>E-Mail:</label>
+                <input type="email" name="user-email" id="">
+            </div>
+            <div class="form-row">
+                <label>Kennwort:</label>
+                <input type="password" name="user-password">
+            </div>
+            <div class="form-row">
+                <input class="register-login-btn" type="submit" name="login-btn" value="Anmelden">
+            </div>
+        </form>
+        <p class="link">Noch nicht registriert?<a href="register.php">Hier registrieren</a></p>
+    </main>
+
 </body>
 </html>
