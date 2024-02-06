@@ -10,30 +10,26 @@ if(!isset($_SESSION['logged_in'])){
 }
 
 
-
 //USER_ID for queries => added in v3
 if(isset($_SESSION['logged_in'])){
     $userId = $_SESSION['user_id'];
 }
 
 
-
-
-
-//get balance changed to v3
+//get balance
 $stmt = $conn_db->prepare("SELECT SUM(input_amount) FROM inputs WHERE user_id = ?");
 $stmt->bind_param('i', $userId);
 $stmt->execute();
 $getBalance = $stmt->get_result();
 
-// get 10 incomes //changed to v3
+// get 10 incomes
 $stmt1 = $conn_db->prepare("SELECT * FROM inputs WHERE input_amount > 0 AND user_id = ?
                                            ORDER BY input_datum DESC LIMIT 10");
 $stmt1->bind_param('i', $userId);
 $stmt1->execute();
 $incomes = $stmt1->get_result();
 
-// get 10 expenses //changed to v3
+// get 10 expenses
 $stmt2 = $conn_db->prepare("SELECT * FROM inputs WHERE input_amount < 0 AND user_id = ? 
                             ORDER BY input_datum DESC LIMIT 10;");
 $stmt2->bind_param('i', $userId);
@@ -57,17 +53,13 @@ $repeatedCategories = $stmt3->get_result();
 // Input
 if(isset($_POST['submit-btn'])) {
 
-    $category_bool = $category['category_name'];
+    $category_repeated_bool = $category['category_input'];
 
     $inputName        = $_POST['input-name'];
     $inputCategoryId  = $_POST['input-category'];
     $inputAmount      = $_POST['input-amount'];
     $inputDate        = $_POST['input-date'];
     $inputDescription = $_POST['input-description'];
-
-    if($category_bool = 1 && $inputAmount > 0){
-        $inputAmount = $inputAmount * -1;
-    }
 
     $stmt4 = $conn_db->prepare("INSERT INTO inputs (input_name, category_id, input_amount, input_datum, input_description, user_id)
                                 VALUES(?,?,?,?,?,?)");
@@ -81,16 +73,14 @@ if(isset($_POST['submit-btn'])) {
 
 if(isset($_POST['submit-repeated-btn'])) {
 
-    $category_repeated_bool = $category['category_name'];
+    
+
+    $category_repeated_bool = $category['category_input'];
 
     $inputRepeatedName        = $_POST['input-repeated-name'];
     $inputRepeatedCategoryId  = $_POST['input-repeated-category'];
     $inputRepeatedAmount      = $_POST['input-repeated-amount'];
     $inputRepeatedDescription = $_POST['input-repeated-description'];
-
-    if($category_repeated_bool = 1 && $inputRepeatedAmount > 0){
-        $inputRepeatedAmount = $inputRepeatedAmount * -1;
-    }
 
     $stmt5 = $conn_db->prepare("INSERT INTO repeated_inputs (repeated_input_name, category_id, repeated_input_amount, repeated_input_description, user_id)
                                 VALUES(?,?,?,?,?)");
@@ -105,11 +95,7 @@ if(isset($_POST['submit-repeated-btn'])) {
 ?>
 
 <?php include('layouts/header.php'); ?>
-
-    
-
-        
-        
+       
 
 <main>
     <!-- MODALS -->
@@ -145,7 +131,7 @@ if(isset($_POST['submit-repeated-btn'])) {
                 <label>Kategorie</label><br>
                 <select name="input-category">
                     <?php while($category = (mysqli_fetch_array($categories, MYSQLI_ASSOC))) { ?>
-                        <option value="<?php echo $category['category_id'] ?>">
+                        <option value="<?php echo $category['category_id'];?>">
                             <?php echo $category['category_name'] ?>
                         </option>
                     <?php } ?>
@@ -191,7 +177,7 @@ if(isset($_POST['submit-repeated-btn'])) {
                 <label>Kategorie</label><br>
                 <select name="input-repeated-category">
                     <?php while($repeatedCategory = (mysqli_fetch_array($repeatedCategories, MYSQLI_ASSOC))) { ?>
-                        <option value="<?php echo $repeatedCategory['category_id'] ?>">
+                        <option value="<?php echo $repeatedCategory['category_id'];?>">
                             <?php echo $repeatedCategory['category_name'] ?>
                         </option>
                     <?php } ?>

@@ -52,6 +52,52 @@ function hideCategoryField() {
   categoryInputField.style.display = "none";
 }
 
+//all_inputs.php
+
+const buttonPlusAllInputs = document.getElementById(
+  "new-input-plus-all-inputs"
+);
+const minusButtonAllInputs = document.getElementById(
+  "new-input-minus-all-inputs"
+);
+const newInputFieldAllInputs = document.getElementById("new-input-all-inputs");
+
+function displayInputFieldAllInputs() {
+  buttonPlusAllInputs.style.display = "none";
+  minusButtonAllInputs.style.display = "block";
+  newInputFieldAllInputs.style.display = "block";
+}
+
+function hideInputFieldAllInputs() {
+  buttonPlusAllInputs.style.display = "block";
+  minusButtonAllInputs.style.display = "none";
+  newInputFieldAllInputs.style.display = "none";
+}
+
+//repeated_inputs.php
+
+const buttonPlusRepeatedInputs = document.getElementById(
+  "new-input-plus-repeated-inputs"
+);
+const minusButtonRepeatedInputs = document.getElementById(
+  "new-input-minus-repeated-inputs"
+);
+const newInputFieldRepeatedInputs = document.getElementById(
+  "new-input-repeated-inputs"
+);
+
+function displayInputFieldRepeatedInputs() {
+  buttonPlusRepeatedInputs.style.display = "none";
+  minusButtonRepeatedInputs.style.display = "block";
+  newInputFieldRepeatedInputs.style.display = "block";
+}
+
+function hideInputFieldRepeatedInputs() {
+  buttonPlusRepeatedInputs.style.display = "block";
+  minusButtonRepeatedInputs.style.display = "none";
+  newInputFieldRepeatedInputs.style.display = "none";
+}
+
 //Modals dissapear
 // const successModals = document.getElementsByClassName("success");
 // const failureModals = document.querySelectorAll(".failure");

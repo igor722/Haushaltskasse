@@ -24,7 +24,7 @@ if(isset($_GET['logout'])){
     <!-- Buttons -->
     <div class="buttons">
         <a href="index.php"><button>Home</button></a>
-        <a href="all_inputs.php"><button>Eintraege</button></a>
+        <a href="all_inputs.php"><button>Einträge</button></a>
         <a href="repeated_inputs.php"><button>Gespeicherte Einträge</button></a>
         <a href="categories.php"><button>Kategorien</button></a>
         <a href="index.php?logout=1"><button>Logout</button></a>

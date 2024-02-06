@@ -14,6 +14,33 @@ if(isset($_SESSION['logged_in'])){
     $userId = $_SESSION['user_id'];
 }
 
+// get repeated categories
+$stmt30 = $conn_db->prepare("SELECT category_id, category_name, category_income FROM categories WHERE user_id = ?");
+$stmt30->bind_param('i', $userId);
+$stmt30->execute();
+$repeatedCategories = $stmt30->get_result();
+
+if(isset($_POST['submit-repeated-btn'])) {
+
+    //$category_repeated_bool = $category['category_input'];
+
+    $inputRepeatedName        = $_POST['input-repeated-name'];
+    $inputRepeatedCategoryId  = $_POST['input-repeated-category'];
+    $inputRepeatedAmount      = $_POST['input-repeated-amount'];
+    $inputRepeatedDescription = $_POST['input-repeated-description'];
+
+
+    $stmt29 = $conn_db->prepare("INSERT INTO repeated_inputs (repeated_input_name, category_id, repeated_input_amount, repeated_input_description, user_id)
+                                VALUES(?,?,?,?,?)");
+    $stmt29->bind_param('siisi', $inputRepeatedName, $inputRepeatedCategoryId, $inputRepeatedAmount, $inputRepeatedDescription, $userId);
+    if($stmt29->execute()){
+        header('location: repeated_inputs.php?input_success_message=Neue Eintrag eingetragen!');
+    } else {
+        header('location: repeated_inputs.php?input_error_message=Oh no! Ihr Eintrag ist nicht gespeichert! Versuchen Sie nochmal später.');
+    }
+}
+
+
 $stmt11 = $conn_db->prepare("SELECT repeated_input_id, repeated_input_name, repeated_input_amount, categories.category_id, categories.category_name 
                             FROM repeated_inputs
                             LEFT JOIN categories ON categories.category_id = repeated_inputs.category_id
@@ -56,7 +83,6 @@ if(isset($_POST['edit-btn'])){
 }
 
 
-
 // DELETE REPEATED INPUT
 if(isset($_POST['delete-btn'])){
 
@@ -89,10 +115,7 @@ if(isset($_POST['insert-btn'])){
     } else {
         header('location: all_inputs.php?add_failure_message=Fehler betreten!Ihr Eintrag wurde nicht zugefügt!');
     }
-
-
 }
-
 
 ?>
 
@@ -115,6 +138,51 @@ if(isset($_POST['insert-btn'])){
     <?php if(isset($_GET['delete_success_message'])) { ?>
         <p class="success"><?php echo $_GET['delete_success_message']; ?></p>
     <?php } ?>
+
+     <!-- display Form Buttons -->
+    <div class="new-input-buttons">
+        <button id="new-input-plus-repeated-inputs" onclick="displayInputFieldRepeatedInputs()">Neue feste Eintrag</button>
+        <button id="new-input-minus-repeated-inputs" onclick="hideInputFieldRepeatedInputs()">x</button>
+    </div>
+
+    <form id="new-input-repeated-inputs" action="repeated_inputs.php" method="POST">
+            <p class="input-info">Neue Feste Eintrag:</p>
+
+            <!-- Kategorie -->
+            <div class="form-unit">
+                <label>Kategorie</label><br>
+                <select name="input-repeated-category">
+                    <?php while($repeatedCategory = (mysqli_fetch_array($repeatedCategories, MYSQLI_ASSOC))) { ?>
+                        <option value="<?php echo $repeatedCategory['category_id'];?>">
+                            <?php echo $repeatedCategory['category_name'] ?>
+                        </option>
+                    <?php } ?>
+                </select>
+                </div>
+            </div>   
+
+            <div class="form-row">
+                <label>Bezeichnung</label><br>
+                <input type="text" name="input-repeated-name" id="input-repeated-name" required></input><br>
+            </div>   
+                        
+                <!-- Betrag -->
+            <div class="form-row">
+                <div class="form-unit">
+                    <label>Betrag:</label><br>
+                    <input type="number" name="input-repeated-amount" id="input-repeated-amount" required></input><br>
+                </div>
+            </div>
+                <!-- Beschreibung -->
+            <div class="form-row">
+                <div class="for-unit">
+                    <label>Beschreibung(Optional):</label><br>
+                    <input type="text" name="input-repeated-description" id="input-repeated-description"></input><br>
+                </div>
+        
+                <input type="submit" class="submit-button" name="submit-repeated-btn">
+            </div>
+        </form>
 
     <table>
     <?php while($displayAllRepeatedInputs = (mysqli_fetch_array($getAllRepeatedInputs, MYSQLI_ASSOC))) {?>

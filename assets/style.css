@@ -226,9 +226,50 @@ input:focus {
     color: #48D390;
 }
 
+/* ===================PAGINATION=================== */
+.pagination{
+    padding: 0;
+}
+
+.container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container .pagination {
+    position: relative;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+    border-radius: 10px;
+}
+
+.container .pagination li {
+    list-style-type: none;
+    display: inline-block;
+}
+
+.container .pagination li a {
+    position: relative;
+    padding: 5px 20px;;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+}
+
+.container .pagination li a:hover,
+.container .pagination li.active a {
+    background: rgba(255, 255, 255, 0.2);
+}
 
 
-/* ===================SINGLE INPUT=================== */
+/* =================== INPUTS =================== */
 table {
     width: 100%;
 }
@@ -315,6 +356,30 @@ button:focus {
     color: rgb(137, 2, 2);
     text-align: center;
     background: #E9599390;
+}
+
+/* form Buttons */
+/* INDEX */
+/* Input form */
+.new-input-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}
+
+.new-input-buttons button {
+    width: 170px;
+    margin: 10px;
+}
+
+#new-input-all-inputs, #new-input-repeated-inputs {
+    display: none;
+}
+
+#new-input-minus-all-inputs, #new-input-minus-repeated-inputs {
+    display: none;
+    background-color: #E95993;
+    width: 50px;
 }
 
 /* =========================SINGLE INPUT========================= */

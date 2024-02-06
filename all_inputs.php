@@ -2,27 +2,84 @@
 
 session_start();
 
+include('server/connection.php');
+
 //Block if not logged_in
 if(!isset($_SESSION['logged_in'])){
     header('location: login.php');
 }
-
-include('server/connection.php');
 
 //USER_ID for queries => added in v3
 if(isset($_SESSION['logged_in'])){
     $userId = $_SESSION['user_id'];
 }
 
-//all inputs
-$stmt6 = $conn_db->prepare("SELECT input_id, input_name, input_amount, input_datum, inputs.user_id, categories.category_id, categories.category_name 
-                            FROM inputs
-                            LEFT JOIN categories ON categories.category_id = inputs.category_id
-                            WHERE inputs.user_id = ?
-                            ORDER BY input_datum DESC");
-$stmt6->bind_param('i', $userId);
-$stmt6->execute();
-$getAllInputs = $stmt6->get_result();
+// get categories
+$stmt27 = $conn_db->prepare("SELECT category_id, category_name, category_income FROM categories WHERE user_id = ?");
+$stmt27->bind_param('i', $userId);
+$stmt27->execute();
+$categoriesAllInputs = $stmt27->get_result();
+
+if(isset($_POST['submit-btn'])) {
+
+
+    $inputName        = $_POST['new-input-name'];
+    $inputCategoryId  = $_POST['new-input-category'];
+    $inputAmount      = $_POST['new-input-amount'];
+    $inputDate        = $_POST['new-input-date'];
+    $inputDescription = $_POST['new-input-description'];
+
+
+    $stmt28 = $conn_db->prepare("INSERT INTO inputs (input_name, category_id, input_amount, input_datum, input_description, user_id)
+                                VALUES(?,?,?,?,?,?)");
+    $stmt28->bind_param('siissi', $inputName, $inputCategoryId, $inputAmount, $inputDate, $inputDescription, $userId);
+    if($stmt28->execute()){
+        header('location: all_inputs.php?input_success_message=Neue Eintrag eingetragen!');
+    } else {
+        header('location: all_inputs.php?input_error_message=Oh no! Ihr Eintrag ist nicht gespeichert! Versuchen Sie nochmal später.');
+    }
+}
+
+
+
+//PAGINATION
+//1. determine page no
+if(isset($_GET['page_no']) && $_GET['page_no'] != ""){
+    //if user has already entered page number
+    $page_no = $_GET['page_no'];
+} else {
+    $page_no = 1;
+}
+
+// 2. return number of products
+
+$stmt25 = $conn_db->prepare("SELECT COUNT(*) AS total_inputs FROM inputs WHERE user_id = ?");
+$stmt25->bind_param('i', $userId);
+$stmt25->execute();
+$stmt25->bind_result($total_inputs);
+$stmt25->store_result();
+$stmt25->fetch();
+
+// 3. products per page
+$total_inputs_per_page = 15;
+$offset = ($page_no - 1) * $total_inputs_per_page;
+
+$previous_page = $page_no - 1;
+$next_page = $page_no + 1;
+
+$total_no_of_pages = ceil($total_inputs / $total_inputs_per_page);
+
+//4. get all products
+$stmt26 = $conn_db->prepare("SELECT input_id, input_name, input_amount, input_datum, inputs.user_id, categories.category_id, categories.category_name 
+                             FROM inputs
+                             LEFT JOIN categories ON categories.category_id = inputs.category_id
+                             WHERE inputs.user_id = ?
+                             ORDER BY input_datum DESC
+                             LIMIT $offset, $total_inputs_per_page");
+$stmt26->bind_param('i', $userId);
+$stmt26->execute();
+//$products = $stmt26->get_result();
+$inputs = $stmt26->get_result();
 
 //all categories for edit form
 $stmt7 = $conn_db->prepare("SELECT category_id, category_name FROM categories WHERE user_id = ?");
@@ -102,7 +159,59 @@ if(isset($_POST['delete-btn'])){
     <p class="success"><?php echo $_GET['add_success_message']; ?></p>
 <?php } ?>
 
+
+
 <main>
+    <div class="new-input-buttons">
+        <button id="new-input-plus-all-inputs" onclick="displayInputFieldAllInputs()">Neue Eintrag</button>
+        <button id="new-input-minus-all-inputs" onclick="hideInputFieldAllInputs()">x</button>
+    </div>
+    <form id="new-input-all-inputs" class="popup" action="all_inputs.php" method="POST">   
+            <p class="input-info">Neue Eintrag:</p>
+
+            <!-- Kategorie -->
+            <div class="form-unit">
+                <label>Kategorie</label><br>
+                <select name="new-input-category">
+                    <?php while($categoryAllInputs = (mysqli_fetch_array($categoriesAllInputs, MYSQLI_ASSOC))) { ?>
+                        <option value="<?php echo $categoryAllInputs['category_id'];?>">
+                            <?php echo $categoryAllInputs['category_name'] ?>
+                        </option>
+                    <?php } ?>
+                </select>
+                </div>
+            </div>   
+
+            <div class="form-row">
+                <label>Bezeichnung</label><br>
+                <input type="text" name="new-input-name" id="input-name" required></input><br>
+            </div>   
+                        
+                <!-- Betrag -->
+            <div class="form-row">
+                <div class="form-unit">
+                    <label>Betrag:</label><br>
+                    <input type="number" name="new-input-amount" id="input-amount" required></input><br>
+                </div>
+                <!-- Datum -->
+                <div class="form-unit">
+                    <label>Datum der Einnahme/Ausgabe:</label><br>
+                    <input type="date" name="new-input-date" id="input-date" required></input><br>
+                </div>
+            </div>
+                <!-- Beschreibung -->
+            <div class="form-row">
+                <div class="for-unit">
+                    <label>Beschreibung(Optional):</label><br>
+                    <input type="text" name="new-input-description" id="input-description"></input><br>
+                </div>
+        
+                <input type="submit" class="submit-button" name="submit-btn">
+            </div>
+        </form>
+
+
+
     <table>
         <tr>
             <th>Datum</th>
@@ -113,7 +222,8 @@ if(isset($_POST['delete-btn'])){
             <th>Löschen</th>
             <th>Ansehen</th>
         </tr>
-    <?php while($displayAllInputs = (mysqli_fetch_array($getAllInputs, MYSQLI_ASSOC))) {?>
+    
+    <?php foreach($inputs as $displayAllInputs) {?>
         <tr>
             <form method="POST" action="all_inputs.php">
                 <input type="hidden" name="input-id" value="<?php echo $displayAllInputs['input_id']; ?>">
@@ -134,6 +244,22 @@ if(isset($_POST['delete-btn'])){
         </tr>
     <?php } ?>
     </table>
+    <div class="container">
+        <ul class="pagination">
+            <li class="page-item" <?php if($page_no <= 1){echo 'disabled';} ?>>
+                <a class="page-link" href="<?php if($page_no <= 1){echo '#';} else {echo "?page_no=" . ($page_no - 1);} ?>">Vorherige</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="?page_no=1">1</a></li>
+            <li class="page-item"><a class="page-link" href="?page_no=2">2</a></li>
+            <?php if($page_no >= 3) { ?>
+                <li class="page-item"><a class="page-link" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="all_inputs.php?<?php echo "page_no=" . $total_no_of_pages; ?>"><?php echo $total_no_of_pages ?></a></li>
+            <?php } ?>
+            <li class="page-item" <?php if($page_no >= $total_no_of_pages){echo 'disabled';} ?>>
+                <a class="page-link" href="<?php if($page_no >= $total_no_of_pages){echo '#';} else {echo "?page_no=" . ($page_no + 1);} ?>">Nächste</a>
+            </li>
+        </ul>
+    </div>
 </main>
 
 <?php include('layouts/footer.php'); ?>
